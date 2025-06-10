@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naujo rezultato įvedimas</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYGX2gOYYZ3NC2P-rYsfBBDARTyjGpl-s",
+      authDomain: "geriausilaikai.firebaseapp.com",
+      databaseURL: "https://geriausilaikai-default-rtdb.firebaseio.com",
+      projectId: "geriausilaikai",
+      storageBucket: "geriausilaikai.firebasestorage.app",
+      messagingSenderId: "1090896499765",
+      appId: "1:1090896499765:web:9be25fdf8a9b102ed28d7c",
+      measurementId: "G-WDZBS89EC6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const surfaceSelect = document.getElementById('surface');
+    const countrySelect = document.getElementById('country');
+    const trackSelect = document.getElementById('track_id');
+    const classSelect = document.getElementById('class');
+    const carSelect = document.getElementById('car_id');
+    const driverSelect = document.getElementById('driver_id');
+    const newDriverInput = document.getElementById('new_driver');
+    const dateInput = document.getElementById('date');
+    const timeFmtInput = document.getElementById('time_fmt');
+    const rankInput = document.getElementById('world_rank');
+    const form = document.getElementById('result-form');
+
+    // nustatome šiandienos datą formoje
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    timeFmtInput.addEventListener('input', () => {
+      let v = timeFmtInput.value.replace(/[^\d]/g, '');
+      if (v.length >= 2) v = v.slice(0, 2) + ':' + v.slice(2);
+      if (v.length >= 5) v = v.slice(0, 5) + '.' + v.slice(5);
+      timeFmtInput.value = v;
+    });
+
+    function saveSelection(id, value) {
+      localStorage.setItem(id, value);
+    }
+    function getSavedSelection(id) {
+      return localStorage.getItem(id);
+    }
+
+    function loadOptions(refPath, callback) {
+      const dataRef = ref(db, refPath);
+      onValue(dataRef, (snapshot) => {
+        callback(snapshot.val() || {});
+      }, { onlyOnce: true });
+    }
+
+    let allTracks = {}, allCars = {}, allDrivers = {}, allClasses = {}, allCountries = {};
+
+    loadOptions('drivers', data => {
+      allDrivers = data;
+      driverSelect.innerHTML = '';
+      for (const id in data) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = data[id].name;
+        driverSelect.appendChild(option);
+      }
+    });
+
+    loadOptions('cars', data => {
+      allCars = data;
+      updateCars();
+    });
+
+    loadOptions('classes', data => {
+      allClasses = data;
+      classSelect.innerHTML = '';
+      for (const id in data) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = data[id].name;
+        classSelect.appendChild(option);
+      }
+      updateCars();
+    });
+
+    loadOptions('tracks', data => {
+      allTracks = data;
+      updateTracks();
+    });
+
+    loadOptions('countries', data => {
+      allCountries = data;
+      countrySelect.innerHTML = '';
+      for (const id in data) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = data[id].name;
+        countrySelect.appendChild(option);
+      }
+      const savedCountry = getSavedSelection('country');
+      if (savedCountry) countrySelect.value = savedCountry;
+      updateTracks();
+    });
+
+    function updateTracks() {
+      const selectedCountry = countrySelect.value;
+      const selectedSurface = surfaceSelect.value;
+      saveSelection('country', selectedCountry);
+      saveSelection('surface', selectedSurface);
+      trackSelect.innerHTML = '';
+      for (const id in allTracks) {
+        const track = allTracks[id];
+        if (track.country_id === selectedCountry && track.surface === selectedSurface) {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = track.name;
+          trackSelect.appendChild(option);
+        }
+      }
+      const savedTrack = getSavedSelection('track_id');
+      if (savedTrack) trackSelect.value = savedTrack;
+    }
+
+    function updateCars() {
+      const selectedClass = classSelect.value;
+      carSelect.innerHTML = '';
+      for (const id in allCars) {
+        if (allCars[id].class_id === selectedClass) {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = allCars[id].name;
+          carSelect.appendChild(option);
+        }
+      }
+    }
+
+    countrySelect.addEventListener('change', updateTracks);
+    surfaceSelect.addEventListener('change', updateTracks);
+    classSelect.addEventListener('change', updateCars);
+    trackSelect.addEventListener('change', () => saveSelection('track_id', trackSelect.value));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      let driverId = driverSelect.value;
+      const newDriverName = newDriverInput.value.trim();
+      if (newDriverName !== '') {
+        const newRef = push(ref(db, 'drivers'), { name: newDriverName });
+        driverId = newRef.key;
+      }
+
+      const timeParts = timeFmtInput.value.split(/[:.]/);
+      const timeSec = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]) + parseInt(timeParts[2]) / 1000;
+
+      const data = {
+        driver_id: driverId,
+        car_id: carSelect.value,
+        track_id: trackSelect.value,
+        date: dateInput.value,
+        time_fmt: timeFmtInput.value,
+        time_sec: timeSec,
+        world_rank: parseInt(rankInput.value) || null,
+        createdAt: serverTimestamp()
+      };
+
+      push(ref(db, 'results'), data);
+      alert('Rezultatas pridėtas!');
+
+      form.reset();
+      setTimeout(() => {
+        countrySelect.value = getSavedSelection('country') || countrySelect.value;
+        surfaceSelect.value = getSavedSelection('surface') || surfaceSelect.value;
+        updateTracks();
+        trackSelect.value = getSavedSelection('track_id') || trackSelect.value;
+        dateInput.value = today;
+      }, 100);
+    });
+  </script>
+</head>
+<body>
+  <h1>Pridėti naują rezultatą</h1>
+  <form id="result-form">
+    <label>Surface:
+      <select id="surface">
+        <option value="dry">dry</option>
+        <option value="wet">wet</option>
+      </select>
+    </label><br>
+    <label>Šalis:
+      <select id="country" required></select>
+    </label><br>
+    <label>Trasa:
+      <select id="track_id" required></select>
+    </label><br>
+    <label>Klasė:
+      <select id="class" required></select>
+    </label><br>
+    <label>Automobilis:
+      <select id="car_id" required></select>
+    </label><br>
+    <label>Vairuotojas:
+      <select id="driver_id"></select>
+      <br> arba įrašyk naują:
+      <input type="text" id="new_driver" placeholder="Naujas vairuotojas">
+    </label><br>
+    <label>Data:
+      <input type="date" id="date" required>
+    </label><br>
+    <label>Laikas (mm:ss.mmm):
+      <input type="text" id="time_fmt" required>
+    </label><br>
+    <label>Reitingo pozicija:
+      <input type="number" id="world_rank" placeholder="pvz. 12345">
+    </label><br>
+    <button type="submit">Įvesti rezultatą</button>
+  </form>
+  <p><a href="index.html">⬅ Grįžti į pradžią</a></p>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <title>Geriausi laikai</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYGX2gOYYZ3NC2P-rYsfBBDARTyjGpl-s",
+      authDomain: "geriausilaikai.firebaseapp.com",
+      databaseURL: "https://geriausilaikai-default-rtdb.firebaseio.com",
+      projectId: "geriausilaikai",
+      storageBucket: "geriausilaikai.firebasestorage.app",
+      messagingSenderId: "1090896499765",
+      appId: "1:1090896499765:web:9be25fdf8a9b102ed28d7c",
+      measurementId: "G-WDZBS89EC6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const resultsRef = query(ref(db, 'results'), orderByChild('createdAt'), limitToLast(10));
+
+    const driverMap = {}, trackMap = {}, carMap = {};
+
+    function loadMap(refPath, map) {
+      onValue(ref(db, refPath), (snapshot) => {
+        const data = snapshot.val();
+        for (const id in data) {
+          map[id] = data[id].name;
+        }
+      }, { onlyOnce: true });
+    }
+
+    loadMap('drivers', driverMap);
+    loadMap('tracks', trackMap);
+    loadMap('cars', carMap);
+
+    onValue(resultsRef, (snapshot) => {
+      const table = document.getElementById('results');
+      table.innerHTML = `<tr>
+        <th>Data</th><th>Vairuotojas</th><th>Automobilis</th>
+        <th>Trasa</th><th>Laikas</th><th>Reitingas</th>
+      </tr>`;
+      const data = snapshot.val();
+      const rows = [];
+      for (const key in data) {
+        const r = data[key];
+        rows.push({
+          date: r.date,
+          driver: driverMap[r.driver_id] || r.driver_id,
+          car: carMap[r.car_id] || r.car_id,
+          track: trackMap[r.track_id] || r.track_id,
+          time: r.time_fmt,
+          rank: r.world_rank ?? ''
+        });
+      }
+      rows.reverse();
+      for (const row of rows) {
+        table.innerHTML += `<tr>
+          <td>${row.date}</td><td>${row.driver}</td><td>${row.car}</td>
+          <td>${row.track}</td><td>${row.time}</td><td>${row.rank}</td>
+        </tr>`;
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Paskutiniai 10 rezultatų</h1>
+  <table id="results" border="1"></table>
+  <p><a href="form.html">➕ Pridėti naują rezultatą</a></p>
+</body>
+</html>

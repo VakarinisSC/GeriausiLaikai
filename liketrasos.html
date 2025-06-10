@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trūkstami rezultatai</title>
+  <style>
+    .missing { font-weight: bold; color: black; }
+    .present { color: gray; }
+    .track-block { margin-left: 1em; }
+    .class-list { margin-left: 2em; }
+  </style>
+</head>
+<body>
+  <h1>Trūkstami rezultatai</h1>
+  <label for="driver">Pasirinkite vairuotoją:</label>
+  <select id="driver"></select>
+
+  <label for="surface">Paviršius:</label>
+  <select id="surface">
+    <option value="dry">dry</option>
+    <option value="wet">wet</option>
+  </select>
+
+  <div id="results"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYGX2gOYYZ3NC2P-rYsfBBDARTyjGpl-s",
+      authDomain: "geriausilaikai.firebaseapp.com",
+      databaseURL: "https://geriausilaikai-default-rtdb.firebaseio.com",
+      projectId: "geriausilaikai",
+      storageBucket: "geriausilaikai.firebasestorage.app",
+      messagingSenderId: "1090896499765",
+      appId: "1:1090896499765:web:9be25fdf8a9b102ed28d7c",
+      measurementId: "G-WDZBS89EC6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const driverSelect = document.getElementById('driver');
+    const surfaceSelect = document.getElementById('surface');
+    const resultsDiv = document.getElementById('results');
+
+    let drivers = {}, tracks = {}, countries = {}, classes = {}, cars = {}, results = {};
+
+    function fetchAll() {
+      const paths = ['drivers', 'tracks', 'countries', 'classes', 'cars', 'results'];
+      let loaded = 0;
+      paths.forEach(path => {
+        onValue(ref(db, path), snap => {
+          switch (path) {
+            case 'drivers': drivers = snap.val() || {}; break;
+            case 'tracks': tracks = snap.val() || {}; break;
+            case 'countries': countries = snap.val() || {}; break;
+            case 'classes': classes = snap.val() || {}; break;
+            case 'cars': cars = snap.val() || {}; break;
+            case 'results': results = snap.val() || {}; break;
+          }
+          loaded++;
+          if (loaded === paths.length) buildUI();
+        }, { onlyOnce: true });
+      });
+    }
+
+    function buildUI() {
+      driverSelect.innerHTML = '';
+      for (const id in drivers) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = drivers[id].name;
+        driverSelect.appendChild(opt);
+      }
+      driverSelect.addEventListener('change', filterMissing);
+      surfaceSelect.addEventListener('change', filterMissing);
+      filterMissing();
+    }
+
+    function filterMissing() {
+      const driverId = driverSelect.value;
+      const surface = surfaceSelect.value;
+      const byCountry = {};
+
+      for (const trackId in tracks) {
+        const track = tracks[trackId];
+        if (track.surface !== surface) continue;
+        const country = countries[track.country_id]?.name || 'Nežinoma';
+        if (!byCountry[country]) byCountry[country] = [];
+
+        const presentClasses = new Set();
+        for (const resId in results) {
+          const res = results[resId];
+          if (res.driver_id === driverId && res.track_id === trackId) {
+            const carClass = cars[res.car_id]?.class_id;
+            if (carClass) presentClasses.add(carClass);
+          }
+        }
+
+        const allClassIds = Object.keys(classes);
+        const missingClasses = allClassIds.filter(cid => {
+          return Object.values(cars).some(car => car.class_id === cid) && !presentClasses.has(cid);
+        });
+
+        byCountry[country].push({
+          name: track.name,
+          id: trackId,
+          total: allClassIds.length,
+          missing: missingClasses.length,
+          presentClasses,
+          missingClasses
+        });
+      }
+
+      renderResults(byCountry);
+    }
+
+    function renderResults(data) {
+      resultsDiv.innerHTML = '';
+      for (const country in data) {
+        const list = data[country];
+        const tracksWithMissing = list.filter(t => t.missing > 0);
+        if (tracksWithMissing.length === 0) continue;
+
+        const h2 = document.createElement('h2');
+        h2.textContent = `${country} (${list.length}/${tracksWithMissing.length})`;
+        resultsDiv.appendChild(h2);
+
+        tracksWithMissing.forEach(track => {
+          const block = document.createElement('div');
+          block.className = 'track-block';
+          block.innerHTML = `<strong>${track.name}</strong>`;
+
+          const classList = document.createElement('div');
+          classList.className = 'class-list';
+          Object.keys(classes).forEach(cid => {
+            const name = classes[cid].name;
+            const span = document.createElement('span');
+            span.textContent = name + ' ';
+            if (track.presentClasses.has(cid)) {
+              span.className = 'present';
+            } else {
+              span.className = 'missing';
+            }
+            classList.appendChild(span);
+          });
+          block.appendChild(classList);
+          resultsDiv.appendChild(block);
+        });
+      }
+    }
+
+    fetchAll();
+  </script>
+</body>
+</html>
