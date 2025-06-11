@@ -1,0 +1,18 @@
+Kaip peržiūrėti versijas ir istoriją GitHub'e?
+GitHub svetainė yra puikus būdas vizualiai matyti jūsų projekto istoriją.
+Eikite į savo saugyklos puslapį GitHub'e. ( https://github.com/J%C5%AAS%C5%B2_GITHUB_VARTOTOJO_VARDAS/geriausilaikai-website  - pakeiskite savo vartotojo vardu ir saugyklos pavadinimu, jei skiriasi).
+Peržiūrėti "Commit'ų" istoriją:
+Pagrindiniame saugyklos puslapyje, virš failų sąrašo, pamatysite eilutę, kurioje nurodytas paskutinis "commit'as" (jo pradžia) ir šalia jo esantį mygtuką su užrašu panašiu į "NN commits" (kur NN yra "commit'ų" skaičius). Spustelėkite ant šio mygtuko.
+Pateksite į puslapį, kuriame matysite visą savo projektų "commit'ų" istoriją . Kiekvienas įrašas rodo:
+"Commit'o" pranešimą (ką padarėte).
+Kas padarė "commit'ą".
+Kada jis buvo padarytas.
+Unikalų "commit'o" ID (ilgas raidžių ir skaičių derinys, vadinamas SHA).
+Galite spausti ant kiekvieno "commit'o" pranešimo, kad pamatytumėte konkrečius pakeitimus , padarytus tame "commit'e" (kurios eilutės buvo pridėtos, kurios ištrintos, kuriuose failuose).
+Peržiūrėti failus konkrečioje versijoje (commit'e):
+Pagrindiniame saugyklos puslapyje, virš failų sąrašo, yra mygtukas, rodantis dabartinę aktyvią šaką (dažniausiai bus main arba master ).
+Spustelėkite ant šio mygtuko. Atsidarys išskleidžiamas meniu.
+Meniu viršuje paprastai matysite "Branches" ir "Tags". Apačioje bus parinktis "Commits". Galite įvesti "commit'o" ID (SHA) arba tiesiog naršyti neseniai atliktus "commit'us".
+Pasirinkę konkretų "commit'ą" (spustelėję ant jo SHA), jūs būsite nukreipti į tą pačią saugyklos puslapį, bet dabar matysite failų sąrašą tokį, koks jis buvo tame konkrečiame istorijos momente . GitHub rodys pranešimą viršuje, kad naršote failus konkrečiame "commit'e".
+Taigi, GitHub'e galite ne tik matyti visų savo įkeltų versijų (commit'ų) sąrašą su aprašymais, bet ir pažiūrėti, kaip atrodė jūsų projekto failai bet kuriuo istorijos momentu.
+Naudojant Git ir GitHub jūsų "geriausilaikai" projektui suteikia daug saugumo (nes turite atsarginę kopiją ir istoriją) ir tvarkos (galite lengvai grįžti prie senesnės versijos ar suprasti, kada ir kodėl buvo atliktas konkretus pakeitimas).

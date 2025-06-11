@@ -12,6 +12,7 @@
   </style>
 </head>
 <body>
+  <div id="menu"></div>
   <h1>Trūkstami rezultatai</h1>
   <label for="driver">Pasirinkite vairuotoją:</label>
   <select id="driver"></select>
@@ -152,6 +153,13 @@
         });
       }
     }
+
+    // Įterpiame bendrą meniu iš išorinio failo
+    fetch("menu.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("menu").innerHTML = html;
+      });
 
     fetchAll();
   </script>

@@ -1,0 +1,34 @@
+Mano Svarbios Komandos Web App / Git / Firebase Hosting projektui ("GeriausiLaikai")
+1. Git & GitHub Komandos (Darbas su kodu ir versijomis)
+git clone <GitHub_projekt_URL>
+Aprašymas: Atsisiunčia (klonuoja) visą projekto kodą iš GitHub saugyklos į jūsų kompiuterį. Naudojama, kai pirmą kartą nustatote projektą naujame kompiuteryje.
+Pavyzdys: git clone https://github.com/jusu_vartotojas/geriausilaikai.git
+cd <projekto_aplanko_pavadinimas>
+Aprašymas: Pereina į jūsų projekto aplanką terminale. Šią komandą reikia paleisti prieš daugumą kitų projekto specifinių komandų (Git, NPM, Firebase).
+Pavyzdys: cd geriausilaikai
+git status
+Aprašymas: Parodo, kurie failai buvo pakeisti, kurie paruošti pridėjimui (staged) ir kurie dar ne. Padeda pamatyti, ką ruošiatės įrašyti (commit'inti).
+git add .
+Aprašymas: Prideda visus pakeistus ar naujus failus dabartiniame kataloge ir jo subkataloguose prie "stage" srities, ruošiant juos commit'ui. Taškas ( . ) reiškia "visi failai šiame kataloge ir žemiau".
+git commit -m "Trumpas pakeitimu aprasymas"
+Aprašymas: Įrašo (sukuria commit'ą) pridėtus (staged) failus su trumpu aprašymu. "Trumpas pakeitimu aprasymas" turėtų aiškiai apibūdinti, ką padarėte šiame žingsnyje.
+git push origin <jusu_saka>
+Aprašymas: Nusiunčia jūsų sukurtus commit'us į GitHub (į "origin" nuotolinę saugyklą, į nurodytą šaką, pvz., main arba master ). Tai "išsaugo" jūsų darbą GitHub.
+git pull origin <jusu_saka>
+Aprašymas: Atsisiunčia naujausius pakeitimus iš GitHub saugyklos (iš nurodytos šakos) į jūsų kompiuterį. Naudinga, jei dirbate su kitais arba kitu kompiuteriu ir norite gauti naujausią kodo versiją.
+2. Node/NPM/Yarn/PNPM Komandos (Priklausomybės ir Build'inimas)
+npm install (arba yarn install / pnpm install )
+Aprašymas: Įdiegia visas projekto priklausomybes (bibliotekas, paketus), nurodytas package.json faile. Būtina paleisti po klonavimo arba kai kas nors kitas prideda naujų priklausomybių.
+npm run build (arba atitinkama komanda jūsų projekte)
+Aprašymas: Paleidžia projekto "build" procesą. Tai paverčia jūsų šaltinio kodą (TypeScript, modernus JavaScript, CSS preprocesoriai ir t.t.) į failus, paruoštus talpinimui (Hostingui). Rezultatai paprastai atsiranda public ar dist aplanke.
+3. Firebase CLI Komandos (Darbas su Firebase)
+firebase login
+Aprašymas: Prisijungia prie Firebase per komandinę eilutę naudojant jūsų Google paskyrą. Reikia prisijungti kiekviename kompiuteryje, kuriame norite naudotis Firebase CLI.
+firebase init
+Aprašymas: Inicijuoja Firebase savo projekto aplanke. Klauskite, kurias Firebase paslaugas norite naudoti (Hosting, Functions, Firestore ir t.t.) ir susieja vietinį aplanką su Firebase projektu ( geriausilaikai ). Ši komanda sukurs firebase.json failą. Naudojama tik pirmą kartą nustatant projektą tame aplanke.
+firebase use <projekt_ID>
+Aprašymas: Nustato arba patvirtina, kad šis terminalo langas ir projektas dirba su nurodytu Firebase projektu ( geriausilaikai ).
+Pavyzdys: firebase use geriausilaikai
+Papildomai: Galite naudoti firebase use --add , kad susietumėte konkretų vietinį aplanką su projektu ilgam laikui.
+firebase deploy --only hosting
+Aprašymas: Paima failus iš jūsų nurodyto "public" katalogo ir juos įkelia (deploy'ina) į Firebase Hosting, atnaujindamas jūsų svetainę. Tai komanda, kurią naudojate, kai norite, kad jūsų atlikti pakeitimai būtų matomi internete.
