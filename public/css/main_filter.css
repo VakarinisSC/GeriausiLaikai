@@ -1,0 +1,109 @@
+
+  /* Bendras puslapio stilius - šiek tiek kompaktiškesnis padding */
+  body {
+    font-family: 'Roboto', sans-serif; /* Galite pasirinkti kitą šriftą */
+    line-height: 1.5; /* Šiek tiek mažesnis tarpas tarp eilučių */
+    margin: 0;
+    padding: 15px; /* Sumažintas padding */
+    background-color: #f4f4f4; /* Šviesesnis fonas */
+    color: #333;
+  }
+
+  h1 {
+    color: #333;
+    margin-top: 0; /* Nuimame viršutinį margin */
+    margin-bottom: 15px; /* Sumažintas apatinis margin */
+    font-size: 1.8em; /* Šiek tiek mažesnis šriftas */
+  }
+
+  #menu {
+      /* Jei meniu yra viršuje, galite jį stilizuoti čia */
+      margin-bottom: 15px; /* Sumažintas margin */
+      padding-bottom: 8px; /* Sumažintas padding */
+      border-bottom: 1px solid #eee;
+  }
+
+  /* Stilius pasirinkimo laukeliams ir jų etiketėms */
+  .controls {
+      margin-bottom: 15px; /* Sumažintas margin */
+      display: flex; /* Naudojame flexbox, kad elementai būtų vienoje eilutėje */
+      align-items: center;
+      flex-wrap: wrap; /* Leidžiame elementams persikelti į kitą eilutę mažesniuose ekranuose */
+      gap: 15px; /* Atstumas tarp flex elementų */
+  }
+
+   .controls label,
+   .controls select {
+       /* Atskirų label ir select elementų stilius, jei reikia */
+   }
+
+
+  #results {
+    margin-top: 20px; /* Sumažintas viršutinis margin */
+  }
+
+  /* >>>>>> NAUJA KLASĖ: Konteineris kiekvienai šaliai <<<<<< */
+  .country-block {
+      background-color: #fff; /* Baltas fonas šalies blokui */
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px; /* Padding viduje šalies bloko */
+      margin-bottom: 20px; /* Atskyrimas tarp šalių blokų */
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.05); /* Švelnesnis šešėlis */
+  }
+
+  /* Šalies antraštė šalies bloke */
+  .country-block h2 {
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-top: 0; /* Nuimame viršutinį margin bloke */
+    margin-bottom: 10px; /* Sumažintas apatinis margin */
+    font-size: 1.3em; /* Šiek tiek mažesnis šriftas */
+  }
+
+  /* Trasos blokas šalies bloke - mažesni margin ir padding */
+  .track-block {
+    background-color: #f9f9f9; /* Šviesiai pilkas fonas trasos blokui */
+    border: 1px solid #eee; /* Švelnesnė riba */
+    border-radius: 4px; /* Šiek tiek mažesnis radius */
+    padding: 10px; /* Sumažintas padding */
+    margin-bottom: 10px; /* Sumažintas atskyrimas tarp trasų */
+    box-shadow: none; /* Nuimame šešėlį nuo atskirų trasų, kad būtų kompaktiškiau */
+  }
+
+  .track-block strong {
+      display: block;
+      margin-bottom: 8px; /* Sumažintas margin */
+      font-size: 1em; /* Normalus šrifto dydis */
+      color: #000;
+  }
+
+  .class-list {
+    /* margin-left: 0; */ /* Patikriname ar nulis, jei naudojame UL */
+    padding-left: 0; /* Pašaliname numatytąjį UL/OL padding */
+    list-style: none; /* Pašaliname sąrašo žymeklius */
+    margin: 0; /* Nuimame numatytąjį UL margin */
+  }
+
+  .class-item { /* Klasė kiekvienam klasės elementui (LI) */
+      display: inline-block; /* Svarbu, kad būtų vienoje eilutėje ir persikeltų */
+      margin-right: 8px; /* Sumažintas atstumas tarp klasių */
+      margin-bottom: 4px; /* Šiek tiek atstumo apačioje, kad gerai persikeltų */
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+      white-space: nowrap; /* Neleidžiame klasės pavadinimui peršokti į kitą eilutę per vidurį */
+  }
+
+  .missing {
+      color: #d9534f; /* Raudona spalva trūkstamoms */
+      border: 1px solid #d9534f;
+      background-color: #fdf7f7; /* Labai šviesus fonas */
+  }
+
+  .present {
+      color: #5cb85c; /* Žalia spalva esamoms */
+      border: 1px solid #5cb85c;
+      background-color: #f7fdf7; /* Labai šviesus fonas */
+  }

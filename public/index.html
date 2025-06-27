@@ -4,16 +4,77 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Geriausi laikai</title>
-  <style>
-    body { font-family: sans-serif; }
-    #menu { margin-bottom: 20px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background-color: #f2f2f2; }
-  </style>
+  <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
   <div id="menu"></div>
+
+  <div id="auth">
+    <button id="login-btn">Prisijungti su Google</button>
+    <button id="logout-btn" style="display:none;">Atsijungti</button>
+    <span id="user-info"></span>
+  </div>
+
+  <div id="upload-form">
+    <h2>Pridėti naują rezultatą</h2>
+    <form id="result-form">
+      <div class="form-group">
+        <label for="surface">Paviršius:</label>
+        <select id="surface">
+          <option value="dry">dry</option>
+          <option value="wet">wet</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="country">Šalis:</label>
+        <select id="country" required></select>
+      </div>
+
+      <div class="form-group">
+        <label for="track_id">Trasa:</label>
+        <select id="track_id" required></select>
+      </div>
+
+      <div class="form-group">
+        <label for="class">Klasė:</label>
+        <select id="class" required></select>
+      </div>
+
+      <div class="form-group">
+        <label for="car_id">Automobilis:</label>
+        <select id="car_id" required></select>
+      </div>
+
+      <div class="form-group">
+        <label for="driver_id">Vairuotojas:</label>
+        <select id="driver_id"></select>
+        <div class="new-driver-option">
+          arba įrašyk naują:
+          <input type="text" id="new_driver" placeholder="Naujas vairuotojas">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Data:</label>
+        <input type="date" id="date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="time_fmt">Laikas (mm:ss.mmm):</label>
+        <input type="text" id="time_fmt" required placeholder="pvz. 01:23.456">
+      </div>
+
+      <div class="form-group">
+        <label for="world_rank">Reitingo pozicija:</label>
+        <input type="number" id="world_rank" placeholder="pvz. 12345">
+      </div>
+
+      <button type="submit">Įvesti rezultatą</button>
+    </form>
+    <div id="form-message"></div>
+  </div>
+
   <h1>Naujausi rezultatai</h1>
   <table id="results">
     <thead>
@@ -28,76 +89,7 @@
     </thead>
     <tbody></tbody>
   </table>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCYGX2gOYYZ3NC2P-rYsfBBDARTyjGpl-s",
-      authDomain: "geriausilaikai.firebaseapp.com",
-      databaseURL: "https://geriausilaikai-default-rtdb.firebaseio.com",
-      projectId: "geriausilaikai",
-      storageBucket: "geriausilaikai.firebasestorage.app",
-      messagingSenderId: "1090896499765",
-      appId: "1:1090896499765:web:9be25fdf8a9b102ed28d7c",
-      measurementId: "G-WDZBS89EC6"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    const resultsRef = query(ref(db, 'results'), orderByChild('createdAt'), limitToLast(10));
-
-    let drivers = {}, cars = {}, tracks = {};
-
-    const tableBody = document.querySelector('#results tbody');
-
-    function loadMetadata() {
-      const paths = ['drivers', 'cars', 'tracks'];
-      let loaded = 0;
-      paths.forEach(path => {
-        onValue(ref(db, path), snap => {
-          if (path === 'drivers') drivers = snap.val() || {};
-          if (path === 'cars') cars = snap.val() || {};
-          if (path === 'tracks') tracks = snap.val() || {};
-          loaded++;
-          if (loaded === paths.length) loadResults();
-        }, { onlyOnce: true });
-      });
-    }
-
-    function loadResults() {
-      onValue(resultsRef, snap => {
-        const data = snap.val();
-        tableBody.innerHTML = '';
-        if (!data) return;
-        const list = Object.entries(data).sort((a, b) => b[1].createdAt - a[1].createdAt);
-        list.forEach(([id, res]) => {
-          const tr = document.createElement('tr');
-          const driverName = drivers[res.driver_id]?.name || res.driver_id;
-          const carName = cars[res.car_id]?.name || res.car_id;
-          const trackName = tracks[res.track_id]?.name || res.track_id;
-          tr.innerHTML = `
-            <td>${res.date || ''}</td>
-            <td>${driverName}</td>
-            <td>${trackName}</td>
-            <td>${carName}</td>
-            <td>${res.time_fmt || ''}</td>
-            <td>${res.world_rank || ''}</td>
-          `;
-          tableBody.appendChild(tr);
-        });
-      });
-    }
-
-    fetch("menu.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("menu").innerHTML = html;
-      });
-
-    loadMetadata();
-  </script>
+  <!-- Čia yra vienintelis svarbus pakeitimas - nuoroda į main.js failą 'js' kataloge -->
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
